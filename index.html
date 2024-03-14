@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Datos que me importan</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    </head>
+    <body>
+        <div class="container-fluid m-0 p-0">
+            <div class="row">
+                <div class="col-12 p-5 text-center">Brecha de género por carrera</div>
+            </div>
+            <div class="row g-0" style="height: 75vh;" id="tartas"></div>
+
+            <div class="row">
+                <div class="col-12 p-5 text-center">Inflación últimos 10 años</div>
+                <div class="col-12 p-5 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+                        <g transform="translate(0,500) scale(1,-1)" id="lineas"></g>
+                        <g id="years"></g>
+                    </svg>
+                </div>
+                <div class="col-12 p-5 text-center">Femicidios latinoamericanos 2023</div>
+                <div class="col-12 p-5 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" id="barras"></svg>
+                </div> 
+            </div>
+        </div>
+        <script>
+            // PRIMER GRÁFICO
+
+            // Datos en tarta fueron tomados de https://www.newtral.es/porcentaje-mujeres-universitarias/20220512/
+
+            const tarta = [
+                {region: "Veterinaria", mujer: 77, hombre: 23},
+                { region: "Derecho", mujer: 58, hombre: 42 },
+                { region: "Informática", mujer: 14, hombre: 86 },
+            ];
+
+            const graficaTarta = document.querySelector("#tartas");
+
+            tarta.forEach((d) => {
+                graficaTarta.innerHTML += `<div class="col h-100 d-flex align-items-center justify-content-center"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle class="donut-hole" cx="20" cy="20" r="15.91549430918954" fill="#fff"></circle><circle class="donut-ring" cx="20" cy="20" r="15.91549430918954" fill="transparent" stroke="blue" stroke-width="3"></circle><circle class="donut-segment" cx="20" cy="20" r="15.91549430918954" fill="transparent" stroke="violet" stroke-width="3" stroke-dasharray="${d.mujer} ${100 - d.mujer}" stroke-dashoffset="25"></circle><text x="20" y="20" font-size="3" text-anchor="middle">${d.region}</text></svg></div>`;
+            });
+
+            //SEGUNDO GRÁFICO
+
+            // datos en lineal fueron tomados de https://www.inflation.eu/es/tasas-de-inflacion/chile/inflacion-historica/ipc-inflacion-chile.aspx
+
+            const lineal = {
+                years: [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023],
+                ipc: [301000, 465000, 437000, 271000, 227000, 257000, 300000, 297000, 717000, 1279000, 394000],
+            };
+
+            
+            const graficaLineas = document.querySelector("#lineas");
+
+            // con algo de complicaciones que se pueden resolver googleando https://stackoverflow.com/questions/39560206/change-0-0-from-svg
+
+            let coordenadas = "";
+
+            let momentos = ""
+
+            lineal.ipc.forEach((d, i) => {
+                coordenadas += i*50 + "," + Math.round(d*0.0001) + " ";
+                momentos += `<text x="${i*50}" y="480" font-size="5">${lineal.years[i]}</text> `;
+    
+            })
+
+            console.log(coordenadas);
+
+            console.log(momentos);
+
+            graficaLineas.innerHTML += `<polyline points="${coordenadas}" fill="none" stroke="red"/>`;
+
+            document.querySelector("#years").innerHTML += momentos;
+
+            // TERCER GRÁFICO 
+
+            // datos en barras los ponen ustedes, tomados desde https://www.ciperchile.cl/2024/03/06/8m-la-crisis-de-seguridad-para-las-mujeres/#:~:text=El%20a%C3%B1o%20pasado%2C%20las%20cifras,m%C3%A1s%20alta%20de%20la%20d%C3%A9cada). https://www.ambito.com/informacion-general/femicidios-hubo-322-casos-2023-80-mas-que-el-ano-anterior-n5920419. https://elpais.com/america-colombia/2024-02-12/255-ninos-quedaron-huerfanos-a-causa-de-un-feminicidio-en-colombia-en-2023.html#:~:text=El%20Observatorio%20de%20Feminicidios%2C%20la,por%20un%20feminicidio%20ser%C3%ADan%20957. https://www.dw.com/es/brasil-registr%C3%B3-r%C3%A9cord-de-cuatro-feminicidios-al-d%C3%ADa-en-2023/a-68469883#:~:text=Brasil%20registr%C3%B3%20en%20promedio%20cuatro,D%C3%ADa%20Internacional%20de%20la%20Mujer.
+
+            const barras = [
+    {region:"Chile", numero:43},
+    {region:"Argentina", numero:322},
+    {region:"Colombia", numero:525},
+    {region:"Brasil", numero:1463}
+];
+
+// Ordenar las barras por el número en orden descendente
+barras.sort((a, b) => b.numero - a.numero);
+
+const graficaBarras = document.querySelector("#barras");
+
+// AHORA ARMAREMOS LAS BARRAS 
+
+barras.forEach((d, i) => {
+    // Cambiar el color de las barras
+    let color = i % 2 === 0 ? "purple" : "green";
+    // Ajustar el ancho de las barras
+    let ancho = d.numero / 5 ; // Puedes ajustar el divisor para cambiar la escala
+    
+    graficaBarras.innerHTML += `<g transform="translate(0,${i*50})">
+        <rect x="3" y="10" width="${ancho}" height="15" fill="${color}" />
+        <text x="3" y="10" fill="black">${d.region}</text>
+        <text x="3" y="25" fill="red">${d.numero} </text>
+    </g>`;
+            });
+        </script>
+    </body>
+</html>
